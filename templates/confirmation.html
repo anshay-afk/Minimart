@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Confirmed – MiniMart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 800px;
+      margin: 4rem auto;
+      background: white;
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      animation: fadeIn 0.8s ease;
+      position: relative;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      color: #2ecc71;
+      text-align: center;
+      margin-bottom: 0.5rem;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .checkmark {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #2ecc71;
+      margin: 0 auto 1rem auto;
+      animation: pop 0.5s ease forwards;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .checkmark::after {
+      content: "✔";
+      color: white;
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+    }
+
+    th, td {
+      text-align: center;
+      padding: 0.8rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background-color: #ecf9f1;
+    }
+
+    .summary {
+      margin-top: 2rem;
+      font-size: 1.1rem;
+      font-weight: 500;
+      background: #f9fdfb;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 2rem;
+      background-color: #3d9970;
+      color: white;
+      text-decoration: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #2e7d57;
+    }
+
+    footer {
+      text-align: center;
+      color: #777;
+      margin-top: 3rem;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+
+  <div class="container">
+    <div class="checkmark"></div>
+    <h1>Order Confirmed!</h1>
+    <p style="text-align:center; color:#555;">Thank you for shopping with <strong>MiniMart</strong>. Your order has been placed successfully.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Price (₹)</th>
+          <th>Quantity</th>
+          <th>Total (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cart %}
+        <tr>
+          <td>{{ item['name'] }}</td>
+          <td>{{ item['price'] }}</td>
+          <td>{{ item['quantity'] }}</td>
+          <td>{{ item['price'] * item['quantity'] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="summary">
+      <p><strong>Order ID:</strong> {{ order_id }}</p>
+      <p><strong>Order Time:</strong> {{ order_time }}</p>
+      <p><strong>Total Bill:</strong> ₹{{ total }}</p>
+    </div>
+
+    <div style="text-align:center;">
+      <a href="{{ url_for('home') }}" class="btn">Back to Home</a>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 MiniMart | Happiness Delivered 🍃</p>
+  </footer>
+
+  <script>
+    // Simple confetti animation
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    let confettis = [];
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    for (let i = 0; i < 150; i++) {
+      confettis.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 4,
+        d: Math.random() * 10 + 10,
+        color: `hsl(${Math.random() * 360}, 70%, 60%)`,
+        tilt: Math.random() * 10 - 10
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confettis.forEach(confetti => {
+        ctx.beginPath();
+        ctx.fillStyle = confetti.color;
+        ctx.ellipse(confetti.x, confetti.y, confetti.r, confetti.r / 2, confetti.tilt, 0, 2 * Math.PI);
+        ctx.fill();
+      });
+      update();
+    }
+
+    function update() {
+      confettis.forEach(confetti => {
+        confetti.y += confetti.d * 0.3;
+        confetti.x += Math.sin(confetti.y * 0.05);
+        if (confetti.y > canvas.height) {
+          confetti.y = -10;
+          confetti.x = Math.random() * canvas.width;
+        }
+      });
+    }
+
+    function animate() {
+      draw();
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
