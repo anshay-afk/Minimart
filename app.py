@@ -61,7 +61,7 @@ def update_cart(product_id):
 
 
 
-@app.route('/remove_from_cart/<int:product_id>')
+@app.route('/remove_from_cart/<int:product_id>', methods=['POST'])
 def remove_from_cart(product_id):
     cart = session.get('cart', [])
     cart = [item for item in cart if item['id'] != product_id]
