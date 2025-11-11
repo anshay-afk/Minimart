@@ -29,4 +29,4 @@ A simple Flask-based web application for managing a mini supermarket — includi
 ## AUTHOR 
 
 ANSHAY KAPURWAN
-email - techtree@gmail.com
+email - techtree2004@gmail.com
